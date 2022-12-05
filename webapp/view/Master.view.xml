@@ -1,0 +1,93 @@
+<mvc:View
+	controllerName="sap.test.routing.controller.Master"
+	xmlns="sap.m"
+	xmlns:f="sap.f"
+	xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core">
+	<f:DynamicPage id="dynamicPageId" toggleHeaderOnTitleClick="false">
+		<!-- DynamicPage Title -->
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="Products"/>
+				</f:heading>
+			</f:DynamicPageTitle>
+		</f:title>
+
+		<!-- DynamicPage Content -->
+		<f:content>
+			<VBox fitContainer="true">
+				<OverflowToolbar class="sapFDynamicPageAlignContent">
+					<ToolbarSpacer/>
+					<SearchField search=".onSearch" width="17.5rem"/>
+					<OverflowToolbarButton icon="sap-icon://add" text="Add" type="Transparent" press=".onAdd"/>
+					<OverflowToolbarButton icon="sap-icon://sort" text="Sort" type="Transparent" press=".onSort"/>
+				</OverflowToolbar>
+				<Table
+					id="productsTable"
+					inset="false"
+					items="{
+						path: 'products>/ProductCollection',
+						sorter: {
+							path: 'CustomerName'
+						}
+					}"
+					class="sapFDynamicPageAlignContent"
+					width="auto"
+				>
+					<columns>
+						<Column width="12em">
+							<Text text="OrderId"/>
+						</Column>
+						<Column width="12em">
+							<Text text="Customer Name"/>
+						</Column>
+						<Column width="12em">
+							<Text text="Address"/>
+						</Column>
+						<Column width="12em">
+							<Text text="Order Date"/>
+						</Column>
+						<Column width="12em">
+							<Text text="Status"/>
+						</Column>
+						<Column width="12em">
+							<Text text="Action"/>
+						</Column>
+					</columns>
+					<items>
+						<ColumnListItem type="Navigation">
+							<cells>
+								<ObjectIdentifier title="{products>OrderId}"/>
+								<ObjectIdentifier title="{products>CustomerName}"/>
+								<ObjectIdentifier title="{products>Address}"/>
+								<ObjectIdentifier title="{products>Date}"/>
+								<core:Icon
+									src="{= ${products>Active} ? 'sap-icon://accept' : 'sap-icon://decline'}"
+									class="sapUiMediumMargin"
+								/>
+								<Button
+									icon="sap-icon://delete"
+									type="Reject"
+								/>
+								<!-- <Button
+									icon="{= ${products>Active} ? 'sap-icon://delete' : ''}"
+									type="Reject"
+								/> -->
+							</cells>
+						</ColumnListItem>
+					</items>
+				</Table>
+			</VBox>
+		</f:content>
+
+		<!-- DynamicPage Footer -->
+		<f:footer>
+			<OverflowToolbar>
+				<ToolbarSpacer/>
+				<Button type="Accept" text="Accept"/>
+				<Button type="Reject" text="Reject"/>
+			</OverflowToolbar>
+		</f:footer>
+	</f:DynamicPage>
+</mvc:View>
