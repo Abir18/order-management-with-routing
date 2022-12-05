@@ -82,6 +82,11 @@ controllerName="sap.test.routing.controller.Detail"
 				<subSections>
 					<ObjectPageSubSection>
 						<blocks>
+                            <m:Input
+                                    id="app_input_orderno"
+                                    value=""
+                                    enabled="{oSaveModel>/saveMode}"
+                            />
 							<m:Table
 								id="suppliersTable"
 								items="{path : 'products>/ProductCollection'}">

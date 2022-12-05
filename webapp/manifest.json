@@ -26,6 +26,41 @@
         "config": {
             "fullWidth": true
         },
+        "routing": {
+            "config": {
+                "routerClass": "sap.f.routing.Router",
+                "type": "View",
+                "viewType": "XML",
+                "path": "sap.test.routing.view",
+                "controlId": "flexibleColumnLayout",
+                "transition": "slide",
+                "bypassed": {},
+                "async": true
+            },
+            "routes": [
+                {
+                    "pattern": ":layout:",
+                    "name": "master",
+                    "target": ["master", "detail"]
+                },
+                {
+                    "pattern": "detail/{product}/{layout}",
+                    "name": "detail",
+                    "target": ["master", "detail"]
+                }
+            ],
+            "targets": {
+                "master": {
+                    "name": "Master",
+                    "controlAggregation": "beginColumnPages"
+                },
+                "detail": {
+                    "name": "Detail",
+                    "controlAggregation": "midColumnPages"
+                }
+            }
+        },
+
         "models": {
             "products": {
                 "type": "sap.ui.model.json.JSONModel",

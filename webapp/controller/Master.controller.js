@@ -22,6 +22,7 @@ sap.ui.define(
                 this.oView = this.getView();
                 this._bDescendingSort = false;
                 this.oProductsTable = this.oView.byId("productsTable");
+                this.oRouter = this.getOwnerComponent().getRouter();
             },
 
             onSearch: function (oEvent) {
@@ -53,10 +54,35 @@ sap.ui.define(
                 oBinding.sort(oSorter);
             },
 
-            onListItemPress: function () {
-                var oFCL = this.oView.getParent().getParent();
+            onListItemPress: function (oEvent) {
+                var productPath = oEvent
+                        .getSource()
+                        .getBindingContext("products")
+                        .getPath(),
+                    product = productPath.split("/").slice(-1).pop();
 
-                oFCL.setLayout(fioriLibrary.LayoutType.TwoColumnsMidExpanded);
+                let oData = oEvent.getParameter("arguments");
+
+                let pData = oEvent
+                    .getSource()
+                    .getBindingContext("products")
+                    .getModel()
+                    .getData();
+
+                // let q = pData.ProductCollection.filter((p) => p[0]);
+
+                let selectedProduct = pData.ProductCollection[product].OrderId;
+
+                // console.log(selectedProduct, "id");
+
+                // console.log("sadasd", oData);
+                // console.log("ppp", pData);
+                // console.log("ppp", q);
+
+                this.oRouter.navTo("detail", {
+                    layout: fioriLibrary.LayoutType.TwoColumnsMidExpanded,
+                    product: selectedProduct
+                });
             }
         });
     }
