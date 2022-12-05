@@ -1,117 +1,160 @@
 <mvc:View
-controllerName="sap.test.routing.controller.Detail"
-	xmlns="sap.uxap"
-	xmlns:m="sap.m"
-	xmlns:f="sap.f"
-	xmlns:form="sap.ui.layout.form"
-	xmlns:mvc="sap.ui.core.mvc">
-	<ObjectPageLayout
-		id="ObjectPageLayout"
-		showTitleInHeaderContent="true"
-		alwaysShowContentHeader="false"
-		preserveHeaderStateOnScroll="false"
-		headerContentPinnable="true"
-		isChildPage="true"
-		upperCaseAnchorBar="false">
-		<headerTitle>
-			<ObjectPageDynamicHeaderTitle>
-				<actions>
-					<m:ToggleButton
-						text="Edit"
-						type="Emphasized" 
-                        press=".onEditToggleButtonPress"/>
-					<m:Button
-						text="Delete"
-						type="Transparent"/>
-					<m:Button
-						text="Copy"
-						type="Transparent"/>
-					<m:Button
-						icon="sap-icon://action"
-						type="Transparent"/>
-				</actions>
-			</ObjectPageDynamicHeaderTitle>
-		</headerTitle>
-
-		<headerContent>
-			<m:FlexBox wrap="Wrap" fitContainer="true" alignItems="Stretch">
-				<f:Avatar
-					displaySize="L"
-					displayShape="Square"
-					class="sapUiTinyMarginEnd">
-				</f:Avatar>
-				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
-					<m:Label text="Main Category"/>
-				</m:VBox>
-				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
-					<m:Label text="Subcategory"/>
-				</m:VBox>
-				<m:VBox justifyContent="Center" class="sapUiSmallMarginEnd">
-					<m:Label text="Price"/>
-				</m:VBox>
-			</m:FlexBox>
-		</headerContent>
-
-		<sections>
-			<ObjectPageSection title="General Information">
-				<subSections>
-					<ObjectPageSubSection>
-						<blocks>
-							<form:SimpleForm
-								maxContainerCols="2"
-								editable="false"
-								layout="ResponsiveGridLayout"
-								labelSpanL="12"
-								labelSpanM="12"
-								emptySpanL="0"
-								emptySpanM="0"
-								columnsL="1"
-								columnsM="1">
-								<form:content>
-									<m:Label text="Product ID"/>
-									<m:Label text="Description"/>
-									<m:Label text="Supplier"/>
-								</form:content>
-							</form:SimpleForm>
-						</blocks>
-					</ObjectPageSubSection>
-				</subSections>
-			</ObjectPageSection>
-
-			<ObjectPageSection title="Suppliers">
-				<subSections>
-					<ObjectPageSubSection>
-						<blocks>
-                            <m:Input
-                                    id="app_input_orderno"
-                                    value=""
-                                    enabled="{oSaveModel>/saveMode}"
-                            />
-							<m:Table
-								id="suppliersTable"
-								items="{path : 'products>/ProductCollection'}">
-								<m:columns>
-									<m:Column/>
-								</m:columns>
-								<m:items>
-									<m:ColumnListItem type="Navigation">
-										<m:cells>
-											<m:ObjectIdentifier text="{products>CustomerName}"/>
-										</m:cells>
-									</m:ColumnListItem>
-								</m:items>
-							</m:Table>
-						</blocks>
-					</ObjectPageSubSection>
-				</subSections>
-			</ObjectPageSection>
-		</sections>
-        <footer>
-			<m:OverflowToolbar>
-				<m:ToolbarSpacer/>
-				<m:Button type="Accept" text="Save"/>
-				<m:Button type="Reject" text="Cancel"/>
-			</m:OverflowToolbar>
-		</footer>
-	</ObjectPageLayout>
+	controllerName="sap.test.routing.controller.Detail"
+	xmlns="sap.m"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:core="sap.ui.core"
+	xmlns:l="sap.ui.layout"
+	xmlns:f="sap.ui.layout.form"
+	displayBlock="true"
+>
+	<l:VerticalLayout
+		class="sapUiContentPadding"
+		width="100%"
+	>
+		<FlexBox
+			alignItems="End"
+			justifyContent="End"
+		>
+			<items>
+				<Button
+					id="cancel_button"
+					icon="sap-icon://decline"
+					type="Accept"
+					press=".onCancelPressed"
+				/>
+			</items>
+		</FlexBox>
+		<f:Form
+			id="detail_form"
+			editable="true"
+		>
+			<f:title>
+				<core:Title text="{i18n>addForm}"/>
+			</f:title>
+			<f:layout>
+				<f:ResponsiveGridLayout
+					labelSpanXL="4"
+					labelSpanL="4"
+					labelSpanM="12"
+					labelSpanS="12"
+					adjustLabelSpan="false"
+					emptySpanXL="0"
+					emptySpanL="0"
+					emptySpanM="0"
+					emptySpanS="0"
+					columnsXL="2"
+					columnsL="2"
+					columnsM="1"
+					singleContainerFullSize="false"
+				/>
+			</f:layout>
+			<f:formContainers>
+				<f:FormContainer>
+					<f:formElements>
+						<f:FormElement label="{i18n>orderNo}">
+							<f:fields>
+								<Input
+									id="app_input_orderno"
+									value=""
+									enabled="{oSaveModel>/saveMode}"
+								/>
+							</f:fields>
+						</f:FormElement>
+						<f:FormElement label="{i18n>customerName}">
+							<f:fields>
+								<Input
+									id="app_input_customername"
+									value=""
+									showValueHelp="true"
+									valueHelpOnly="true"
+									valueHelpRequest="handleValueHelp"
+									width="100%"
+									class="sapUiSmallMarginBottom"
+								/>
+							</f:fields>
+						</f:FormElement>
+						<f:FormElement>
+							<FlexBox>
+								<items>
+									<FlexBox
+										id="countryFlexBox"
+										direction="Column"
+										width="100%"
+										class="sapUiTinyMarginEnd"
+									>
+										<Label
+											id="app_label_country"
+											text="{i18n>country}"
+											labelFor="app_input_country"
+										/>
+										<Select
+											width="100%"
+											id="app_input_country"
+											selectedKey=""
+											items="{countries>/}"
+											change="onCountryChange"
+											forceSelection="false"
+										>
+											<items>
+												<core:Item
+													key="{countries>countryName}"
+													text="{countries>countryName}"
+												/>
+											</items>
+										</Select>
+									</FlexBox>
+									<FlexBox
+										id="cityFlexBox"
+										direction="Column"
+										width="100%"
+									>
+										<Label
+											id="app_label_city"
+											text="{i18n>city}"
+											labelFor="app_input_city"
+										/>
+										<Select
+											width="100%"
+											id="app_input_city"
+											selectedKey=""
+											items="{cityName>/cities}"
+											forceSelection="false"
+										>
+											<items>
+												<core:Item
+													key="{cityName>}"
+													text="{cityName>}"
+												/>
+											</items>
+										</Select>
+									</FlexBox>
+								</items>
+							</FlexBox>
+						</f:FormElement>
+						<f:FormElement label="{i18n>date}">
+							<f:fields>
+								<DatePicker
+									id="app_input_date"
+									class="sapUiSmallMarginBottom"
+								/>
+							</f:fields>
+						</f:FormElement>
+					</f:formElements>
+				</f:FormContainer>
+			</f:formContainers>
+		</f:Form>
+		<FlexBox
+			alignItems="Center"
+			id="app_submit"
+			direction="Column"
+			width="100%"
+		>
+			<Button
+				id="app_new_btn"
+				text="{i18n>submit}"
+				press="onSavePressed"
+				visible="{oSaveModel>/saveMode}"
+			/>
+		</FlexBox>
+	</l:VerticalLayout>
 </mvc:View>

@@ -55,6 +55,11 @@ sap.ui.define(
             },
 
             onListItemPress: function (oEvent) {
+                console.log("items found");
+                console.log(
+                    oEvent.getSource().getBindingContext("products"),
+                    "hhh"
+                );
                 var productPath = oEvent
                         .getSource()
                         .getBindingContext("products")
@@ -80,7 +85,7 @@ sap.ui.define(
                 // console.log("ppp", q);
 
                 this.oRouter.navTo("detail", {
-                    layout: fioriLibrary.LayoutType.TwoColumnsMidExpanded,
+                    layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
                     product: selectedProduct
                 });
             }

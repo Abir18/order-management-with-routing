@@ -62,9 +62,21 @@
         },
 
         "models": {
+            "i18n": {
+                "type": "sap.ui.model.resource.ResourceModel",
+                "settings": {
+                    "bundleName": "sap.test.routing.i18n.i18n"
+                },
+                "supportedLocales": ["", "de"],
+                "fallbackLocale": ""
+            },
             "products": {
                 "type": "sap.ui.model.json.JSONModel",
                 "uri": "products.json"
+            },
+            "countries": {
+                "type": "sap.ui.model.json.JSONModel",
+                "uri": "data/countries.json"
             }
         }
     }
