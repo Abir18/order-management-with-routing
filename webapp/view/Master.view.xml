@@ -56,7 +56,7 @@
 						</Column>
 					</columns>
 					<items>
-						<ColumnListItem type="Navigation">
+						<ColumnListItem type="Navigation"  press=".onListItemPress">
 							<cells>
 								<ObjectIdentifier title="{products>OrderId}"/>
 								<ObjectIdentifier title="{products>CustomerName}"/>

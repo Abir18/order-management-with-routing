@@ -7,5 +7,8 @@
             <beginColumnPages>
                 <mvc:XMLView id="beginView" viewName="sap.test.routing.view.Master"/>
             </beginColumnPages>
+            <midColumnPages>
+			    <mvc:XMLView id="detailView" viewName="sap.test.routing.view.Detail"/>
+		    </midColumnPages>
         </FlexibleColumnLayout>
 </mvc:View> 
