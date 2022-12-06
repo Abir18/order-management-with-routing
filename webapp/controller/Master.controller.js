@@ -6,7 +6,13 @@ sap.ui.define(
         "sap/ui/model/Sorter",
         "sap/m/MessageBox",
         "sap/f/library",
-        "sap/ui/model/json/JSONModel"
+        "sap/ui/model/json/JSONModel",
+        "sap/m/Dialog",
+        "sap/m/Button",
+        "sap/m/List",
+        "sap/m/StandardListItem",
+        "sap/m/library",
+        "sap/m/MessageToast"
     ],
     function (
         Controller,
@@ -15,9 +21,19 @@ sap.ui.define(
         Sorter,
         MessageBox,
         fioriLibrary,
-        JSONModel
+        JSONModel,
+        Dialog,
+        Button,
+        List,
+        StandardListItem,
+        mobileLibrary,
+        MessageToast
     ) {
         "use strict";
+        // shortcut for sap.m.ButtonType
+        var ButtonType = mobileLibrary.ButtonType;
+        // shortcut for sap.m.DialogType
+        var DialogType = mobileLibrary.DialogType;
 
         return Controller.extend("sap.test.routing.controller.Master", {
             onInit: function () {
@@ -25,6 +41,8 @@ sap.ui.define(
                 this._bDescendingSort = false;
                 this.oProductsTable = this.oView.byId("productsTable");
                 this.oRouter = this.getOwnerComponent().getRouter();
+
+                // this.getView().getModel("products").refresh();
 
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
@@ -143,8 +161,8 @@ sap.ui.define(
                                         }
                                         return data;
                                     });
-                                console.log(updatedData, "updatedData");
-                                console.log(parseData, "parseData");
+                                // console.log(updatedData, "updatedData");
+                                // console.log(parseData, "parseData");
                                 let mappedStatusData =
                                     parseData.ProductCollection.map((order) => {
                                         if (order.OrderId == orderId) {

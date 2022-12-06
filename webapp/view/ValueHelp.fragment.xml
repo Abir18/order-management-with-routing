@@ -9,10 +9,12 @@
 		cancel=".handleValueHelpClose"
 		showClearButton="false"
 		items="{customers>/ProductCollection}"
+		multiSelect="false"
+		selectionChange=".handleValueHelpSelect"
 	>
 		<ColumnListItem
 			selected="{selected}"
-			type="Navigation"
+			type="Active"
 		>
 			<cells>
 				<ObjectIdentifier title="{customers>OrderId}"/>

@@ -136,10 +136,12 @@ sap.ui.define(
                 // });
                 // oModel.setProperty("/ProductCollection", aProducts);
             },
-            handleValueHelpClose: function (oEvent) {
-                var oSelectedItem = oEvent.getParameter("selectedItem"),
+            handleValueHelpSelect: function (oEvent) {
+                var oSelectedItem = oEvent.getParameter("listItem"),
                     oInput = this.byId("app_input_customername");
+
                 console.log("oSelectedItem", oSelectedItem);
+                oSelectedItem.getCells();
 
                 if (!oSelectedItem) {
                     oInput.resetProperty("value");
@@ -147,6 +149,17 @@ sap.ui.define(
                     return;
                 }
                 oInput.setValue(oSelectedItem.getCells()[1].getText());
+            },
+            handleValueHelpClose: function (oEvent) {
+                // var oSelectedItem = oEvent.getParameter("listItem"),
+                //     oInput = this.byId("app_input_customername");
+                // console.log("oSelectedItem", oSelectedItem);
+                // oSelectedItem.getCells();
+                // if (!oSelectedItem) {
+                //     oInput.resetProperty("value");
+                //     return;
+                // }
+                // oInput.setValue(oSelectedItem.getCells()[1].getText());
             },
 
             onCountryChange: function (oEvent) {
@@ -180,89 +193,165 @@ sap.ui.define(
             },
 
             onSavePressed: function () {
-                console.log("Form SUbmitted");
+                const localData = JSON.parse(
+                    localStorage.getItem("LocalStorageData")
+                );
 
-                const orderId = this.byId("app_input_orderno").getValue();
-                const customerName = this.byId(
-                    "app_input_customername"
-                ).getValue();
+                const id = this.byId("app_input_orderno").getValue();
 
-                const countryName = this.byId("app_input_country")
-                    ?.getSelectedItem()
-                    ?.getText();
-                const cityName = this.byId("app_input_city")
-                    ?.getSelectedItem()
-                    ?.getText();
+                // console.log(id, "localData");
 
-                const date = this.byId("app_input_date").getValue();
+                const filteredData = localData.ProductCollection.filter(
+                    (product) => product.OrderId == id
+                );
+                // console.log(filteredData, "filteredData");
 
-                const newCustomerData = {
-                    OrderId: orderId,
-                    CustomerName: customerName || "John Doe",
-                    Address: `${cityName || "Dhaka"}, ${
-                        countryName || "Bangladesh"
-                    }`,
-                    Date: date
-                        ? new Date(date).toLocaleDateString("en-us", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric"
-                          })
-                        : new Date("11/24/22").toLocaleDateString("en-us", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "short",
-                              day: "numeric"
-                          }),
-                    Delivered: false
-                    // Date: date
-                };
+                if (filteredData.length > 0) {
+                    console.log("found");
+                    console.log(filteredData, "ff");
 
-                this._dataFormat.ProductCollection.push(newCustomerData);
+                    const orderId = this.byId("app_input_orderno").getValue();
+                    const customerName = this.byId(
+                        "app_input_customername"
+                    ).getValue();
+                    const countryName = this.byId("app_input_country")
+                        ?.getSelectedItem()
+                        ?.getText();
+                    const cityName = this.byId("app_input_city")
+                        ?.getSelectedItem()
+                        ?.getText();
 
-                if (localStorage.getItem("LocalStorageData")) {
-                    let newARR = JSON.parse(
-                        localStorage.getItem("LocalStorageData")
+                    const date = this.byId("app_input_date").getValue();
+
+                    const updatedCustomerData = {
+                        OrderId: orderId,
+                        CustomerName: customerName,
+                        Address: `${cityName}, ${countryName}`,
+                        Date: date
+                            ? new Date(date).toLocaleDateString("en-us", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric"
+                              })
+                            : new Date("11/24/22").toLocaleDateString("en-us", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric"
+                              }),
+                        // Date: date
+                        Delivered: false
+                    };
+
+                    console.log(updatedCustomerData, "updatedCustomerData");
+
+                    const mappedData = localData.ProductCollection.map(
+                        (product) => {
+                            if (
+                                product.OrderId == updatedCustomerData.OrderId
+                            ) {
+                                return updatedCustomerData;
+                            }
+                            return product;
+                        }
                     );
 
-                    newARR.ProductCollection.push(newCustomerData);
+                    this._dataFormat.ProductCollection = mappedData;
 
-                    localStorage.setItem(
-                        "LocalStorageData",
-                        JSON.stringify(newARR)
-                    );
-                } else {
                     localStorage.setItem(
                         "LocalStorageData",
                         JSON.stringify(this._dataFormat)
                     );
-                    console.log("not found");
+
+                    console.log("mappedData", mappedData);
+                    console.log("this._dataFormat", this._dataFormat);
+                } else {
+                    // console.log("not found");
+                    console.log("Form SUbmitted");
+
+                    const orderId = this.byId("app_input_orderno").getValue();
+                    const customerName = this.byId(
+                        "app_input_customername"
+                    ).getValue();
+
+                    const countryName = this.byId("app_input_country")
+                        ?.getSelectedItem()
+                        ?.getText();
+                    const cityName = this.byId("app_input_city")
+                        ?.getSelectedItem()
+                        ?.getText();
+
+                    const date = this.byId("app_input_date").getValue();
+
+                    const newCustomerData = {
+                        OrderId: orderId,
+                        CustomerName: customerName || "John Doe",
+                        Address: `${cityName || "Dhaka"}, ${
+                            countryName || "Bangladesh"
+                        }`,
+                        Date: date
+                            ? new Date(date).toLocaleDateString("en-us", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric"
+                              })
+                            : new Date("11/24/22").toLocaleDateString("en-us", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "short",
+                                  day: "numeric"
+                              }),
+                        Delivered: false
+                        // Date: date
+                    };
+
+                    this._dataFormat.ProductCollection.push(newCustomerData);
+
+                    if (localStorage.getItem("LocalStorageData")) {
+                        let newARR = JSON.parse(
+                            localStorage.getItem("LocalStorageData")
+                        );
+
+                        newARR.ProductCollection.push(newCustomerData);
+
+                        localStorage.setItem(
+                            "LocalStorageData",
+                            JSON.stringify(newARR)
+                        );
+                    } else {
+                        localStorage.setItem(
+                            "LocalStorageData",
+                            JSON.stringify(this._dataFormat)
+                        );
+                        console.log("not found");
+                    }
+
+                    this.oRouter.navTo("master", {
+                        layout: fioriLibrary.LayoutType.OneColumn
+                    });
+
+                    this.getView().getModel("products").refresh();
+
+                    // this.byId("app_input_orderno").setValue("");
+
+                    // this.byId("app_input_orderno").setValue(
+                    //     parseInt(Date.now() + Math.random())
+                    //         .toString()
+                    //         .slice(6)
+                    // );
+
+                    // var oFCL = this.oView.getParent().getParent();
+                    // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
+
+                    const localStorageData =
+                        localStorage.getItem("LocalStorageData");
+                    const parseData = JSON.parse(localStorageData);
+                    // console.log(parseData, "parseData");
+                    const ProductsModel = new JSONModel(parseData);
+                    this.getView().setModel(ProductsModel, "products");
                 }
-
-                this.oRouter.navTo("master", {
-                    layout: fioriLibrary.LayoutType.OneColumn
-                });
-
-                this.getView().getModel().refresh();
-
-                // this.byId("app_input_orderno").setValue("");
-
-                // this.byId("app_input_orderno").setValue(
-                //     parseInt(Date.now() + Math.random())
-                //         .toString()
-                //         .slice(6)
-                // );
-
-                // var oFCL = this.oView.getParent().getParent();
-                // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
-
-                // const localStorageData =
-                //     localStorage.getItem("LocalStorageData");
-                // const parseData = JSON.parse(localStorageData);
-                // // console.log(parseData, "parseData");
-                // const ProductsModel = new JSONModel(parseData);
-                // this.getView().setModel(ProductsModel);
             }
         });
     }
