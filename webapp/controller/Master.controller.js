@@ -5,7 +5,8 @@ sap.ui.define(
         "sap/ui/model/FilterOperator",
         "sap/ui/model/Sorter",
         "sap/m/MessageBox",
-        "sap/f/library"
+        "sap/f/library",
+        "sap/ui/model/json/JSONModel"
     ],
     function (
         Controller,
@@ -13,7 +14,8 @@ sap.ui.define(
         FilterOperator,
         Sorter,
         MessageBox,
-        fioriLibrary
+        fioriLibrary,
+        JSONModel
     ) {
         "use strict";
 
@@ -23,6 +25,13 @@ sap.ui.define(
                 this._bDescendingSort = false;
                 this.oProductsTable = this.oView.byId("productsTable");
                 this.oRouter = this.getOwnerComponent().getRouter();
+
+                const localStorageData =
+                    localStorage.getItem("LocalStorageData");
+                const parseData = JSON.parse(localStorageData);
+                // console.log(parseData, "parseData");
+                const ProductsModel = new JSONModel(parseData);
+                this.getView().setModel(ProductsModel, "products");
             },
 
             onSearch: function (oEvent) {
@@ -55,39 +64,170 @@ sap.ui.define(
             },
 
             onListItemPress: function (oEvent) {
-                console.log("items found");
-                console.log(
-                    oEvent.getSource().getBindingContext("products"),
-                    "hhh"
-                );
-                var productPath = oEvent
+                if (oEvent.getSource().getBindingContext("products")) {
+                    // console.log("items found");
+
+                    var productPath = oEvent
+                            .getSource()
+                            .getBindingContext("products")
+                            .getPath(),
+                        product = productPath.split("/").slice(-1).pop();
+
+                    let oData = oEvent.getParameter("arguments");
+
+                    let pData = oEvent
                         .getSource()
                         .getBindingContext("products")
-                        .getPath(),
-                    product = productPath.split("/").slice(-1).pop();
+                        .getModel()
+                        .getData();
 
-                let oData = oEvent.getParameter("arguments");
+                    // let q = pData.ProductCollection.filter((p) => p[0]);
 
-                let pData = oEvent
-                    .getSource()
-                    .getBindingContext("products")
-                    .getModel()
-                    .getData();
+                    let selectedProduct =
+                        pData.ProductCollection[product].OrderId;
 
-                // let q = pData.ProductCollection.filter((p) => p[0]);
+                    // console.log(selectedProduct, "id");
 
-                let selectedProduct = pData.ProductCollection[product].OrderId;
+                    // console.log("sadasd", oData);
+                    // console.log("ppp", pData);
+                    // console.log("ppp", q);
 
-                // console.log(selectedProduct, "id");
+                    this.oRouter.navTo("detail", {
+                        layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
+                        product: selectedProduct
+                    });
+                } else {
+                    // console.log("not found");
 
-                // console.log("sadasd", oData);
-                // console.log("ppp", pData);
-                // console.log("ppp", q);
+                    const randomId = parseInt(Date.now() + Math.random())
+                        .toString()
+                        .slice(6);
 
-                this.oRouter.navTo("detail", {
-                    layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
-                    product: selectedProduct
+                    this.oRouter.navTo("detail", {
+                        layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
+                        product: randomId
+                    });
+                }
+            },
+
+            onStatusChanged: function (orderId, delivered) {
+                if (delivered) return;
+
+                if (!this.oDefaultDialog) {
+                    console.log("Helllooooooo");
+
+                    this.oDefaultDialog = new Dialog({
+                        title: "Are you sure to change this status?",
+
+                        beginButton: new Button({
+                            type: ButtonType.Emphasized,
+                            text: "OK",
+                            press: function () {
+                                const localStorageData =
+                                    localStorage.getItem("LocalStorageData");
+                                const parseData = JSON.parse(localStorageData);
+                                let updatedData =
+                                    parseData.ProductCollection.filter(
+                                        (order) => {
+                                            // console.log(orderId, "orderId");
+                                            return order.OrderId == orderId;
+                                        }
+                                    ).map((data) => {
+                                        if (data.Delivered == false) {
+                                            data.Delivered = true;
+                                            console.log(
+                                                data.Delivered,
+                                                "data.Delivered"
+                                            );
+                                            return data;
+                                        }
+                                        return data;
+                                    });
+                                console.log(updatedData, "updatedData");
+                                console.log(parseData, "parseData");
+                                let mappedStatusData =
+                                    parseData.ProductCollection.map((order) => {
+                                        if (order.OrderId == orderId) {
+                                            // console.log(orderId, "in the middle");
+                                            return updatedData[0];
+                                        }
+                                        return order;
+                                    });
+
+                                let data = {
+                                    ProductCollection: mappedStatusData
+                                };
+                                console.log(data, "data");
+
+                                localStorage.setItem(
+                                    "LocalStorageData",
+                                    JSON.stringify(data)
+                                );
+
+                                const getlocalStorageData =
+                                    localStorage.getItem("LocalStorageData");
+                                const getParseData =
+                                    JSON.parse(getlocalStorageData);
+                                // console.log(getParseData, "parseData");
+                                const ProductsModel = new JSONModel(
+                                    getParseData
+                                );
+                                this.getView().setModel(ProductsModel);
+                                //==============
+                                this.oDefaultDialog.close();
+                                this.getView().getModel().refresh();
+                                var msg = "User status changed";
+                                MessageToast.show(msg);
+                            }.bind(this)
+                        }),
+                        endButton: new Button({
+                            text: "Close",
+                            press: function () {
+                                this.oDefaultDialog.close();
+                            }.bind(this)
+                        })
+                    });
+
+                    console.log(this.oDefaultDialog, "this.oDefaultDialog");
+                    // to get access to the controller's model
+                    this.getView().addDependent(this.oDefaultDialog);
+                }
+                this.getView().getModel().refresh();
+                console.log("this.oDefaultDialog");
+                console.log(this.oDefaultDialog, "this.oDefaultDialog");
+                this.oDefaultDialog.open();
+            },
+
+            onDeleteButtonPressed: function (orderId) {
+                console.log(orderId, typeof orderId);
+                // console.log(oEvent.getParameters());
+                console.log("Deleted");
+
+                let allOrders = JSON.parse(
+                    localStorage.getItem("LocalStorageData")
+                );
+                // console.log(allOrders.ProductCollection);
+
+                let updatedOrderData = allOrders.ProductCollection.filter(
+                    (order) => order.OrderId !== orderId
+                );
+
+                let data = { ProductCollection: updatedOrderData };
+
+                localStorage.setItem("LocalStorageData", JSON.stringify(data));
+
+                const localStorageData =
+                    localStorage.getItem("LocalStorageData");
+                const parseData = JSON.parse(localStorageData);
+                console.log(parseData, "parseData");
+                const ProductsModel = new JSONModel(parseData);
+                this.getView().setModel(ProductsModel);
+
+                this.oRouter.navTo("master", {
+                    layout: fioriLibrary.LayoutType.OneColumn
                 });
+
+                // this.getView().getModel().refresh();
             }
         });
     }

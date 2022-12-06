@@ -70,9 +70,10 @@
                 "supportedLocales": ["", "de"],
                 "fallbackLocale": ""
             },
-            "products": {
+
+            "customers": {
                 "type": "sap.ui.model.json.JSONModel",
-                "uri": "products.json"
+                "uri": "data/products.json"
             },
             "countries": {
                 "type": "sap.ui.model.json.JSONModel",

@@ -15,8 +15,6 @@
 			<Table
 				rows="{products>/ProductCollection}"
 				selectionMode="Single"
-				
-				paste="onPaste"
 				ariaLabelledBy="title"
 			>
 				<extension>
@@ -99,7 +97,7 @@
 						<m:Label text="{i18n>action}"/>
 						<template>
 							<m:Button
-								press="onDeleteButtonPressed(${OrderId})"
+								press="onDeleteButtonPressed(${products>OrderId})"
 								visible="{= ${products>Delivered} ? false : true}"
 								icon="{= ${products>Delivered} ? '' : 'sap-icon://delete'}"
 								type="Reject"
@@ -129,4 +127,3 @@
 		</m:content>
 	</m:Page>
 </mvc:View>
-

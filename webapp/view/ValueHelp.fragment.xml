@@ -1,0 +1,47 @@
+<core:FragmentDefinition
+	xmlns="sap.m"
+	xmlns:core="sap.ui.core"
+>
+	<TableSelectDialog
+		noDataText="No Products Found"
+		title="Select Product"
+		confirm=".handleValueHelpClose"
+		cancel=".handleValueHelpClose"
+		showClearButton="false"
+		items="{customers>/ProductCollection}"
+	>
+		<ColumnListItem
+			selected="{selected}"
+			type="Navigation"
+		>
+			<cells>
+				<ObjectIdentifier title="{customers>OrderId}"/>
+				<Text text="{customers>CustomerName}"/>
+				<Text text="{customers>Address}"/>
+			</cells>
+		</ColumnListItem>
+		<columns>
+			<Column>
+				<header>
+					<Text text="Order No."/>
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Tablet"
+				demandPopin="true"
+			>
+				<header>
+					<Text text="Customer Name"/>
+				</header>
+			</Column>
+			<Column
+				minScreenWidth="Desktop"
+				demandPopin="true"
+			>
+				<header>
+					<Text text="Address"/>
+				</header>
+			</Column>
+		</columns>
+	</TableSelectDialog>
+</core:FragmentDefinition>

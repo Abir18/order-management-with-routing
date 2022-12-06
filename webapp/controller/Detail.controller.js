@@ -1,6 +1,11 @@
 sap.ui.define(
-    ["sap/ui/core/mvc/Controller", "sap/f/library"],
-    function (Controller, fioriLibrary) {
+    [
+        "sap/ui/core/mvc/Controller",
+        "sap/f/library",
+        "sap/ui/model/json/JSONModel",
+        "sap/ui/core/Fragment"
+    ],
+    function (Controller, fioriLibrary, JSONModel, Fragment) {
         "use strict";
 
         return Controller.extend("sap.test.routing.controller.Detail", {
@@ -25,11 +30,45 @@ sap.ui.define(
 
                 let productId = hashRouteMatched.split("/")[1];
 
-                console.log(productId, "productId");
+                const getProducts = JSON.parse(
+                    localStorage.getItem("LocalStorageData")
+                );
 
-                this.byId("app_input_orderno").setValue(productId);
+                const filteredProduct = getProducts.ProductCollection.find(
+                    (product) => product.OrderId == productId
+                );
 
-                this;
+                // console.log(filteredProduct, "filteredProduct");
+
+                if (filteredProduct) {
+                    const {
+                        CustomerName: customerName,
+                        Address: address,
+                        Date: date
+                    } = filteredProduct;
+
+                    const city = address.split(",")[0];
+                    const country = address.split(",")[1];
+
+                    const dateFormat = date.split(",");
+
+                    const dateValue = dateFormat[1] + "," + dateFormat[2];
+
+                    this.byId("app_input_orderno").setValue(productId);
+                    this.byId("app_input_customername").setValue(customerName);
+                    this.byId("app_input_country").setValue(country);
+                    this.byId("app_input_city").setValue(city);
+                    this.byId("app_input_date").setValue(dateValue);
+                } else {
+                    const randomId = parseInt(Date.now() + Math.random())
+                        .toString()
+                        .slice(6);
+                    this.byId("app_input_orderno").setValue(randomId);
+                    this.byId("app_input_customername").setValue("");
+                    this.byId("app_input_country").setValue("");
+                    this.byId("app_input_city").setValue("");
+                    this.byId("app_input_date").setValue("");
+                }
 
                 this._product =
                     oEvent.getParameter("arguments").product ||
@@ -58,9 +97,13 @@ sap.ui.define(
             },
 
             onCancelPressed: function () {
-                var oFCL = this.oView.getParent().getParent();
+                // var oFCL = this.oView.getParent().getParent();
 
-                oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
+                // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
+
+                this.oRouter.navTo("master", {
+                    layout: fioriLibrary.LayoutType.OneColumn
+                });
             },
 
             handleValueHelp: function () {
@@ -69,7 +112,7 @@ sap.ui.define(
                 if (!this._pValueHelpDialog) {
                     this._pValueHelpDialog = Fragment.load({
                         id: oView.getId(),
-                        name: "task.order.management.view.ValueHelp",
+                        name: "sap.test.routing.view.ValueHelp",
                         controller: this
                     }).then(function (oValueHelpDialog) {
                         oView.addDependent(oValueHelpDialog);
@@ -103,9 +146,7 @@ sap.ui.define(
 
                     return;
                 }
-                // console.log(oSelectedItem.getCells()[1]);
                 oInput.setValue(oSelectedItem.getCells()[1].getText());
-                // oInput.setValue(oSelectedItem.getCells()[1].mProperties.text);
             },
 
             onCountryChange: function (oEvent) {
@@ -116,22 +157,112 @@ sap.ui.define(
                     .selectedItem.sId.slice(-1);
 
                 const selectedCountryId = parseInt(selectedCountryIndex) + 1;
-                console.log(selectedCountryId);
+                // console.log(selectedCountryId);
 
                 const countriesData = this.getView()
                     .getModel("countries")
                     .getData();
 
-                console.log(countriesData, "countriesData");
+                // console.log(countriesData, "countriesData");
 
                 const selectedCountryData = countriesData.find(
                     (country) => country.countryId === selectedCountryId
                 );
-                console.log(selectedCountryData);
+                // console.log(selectedCountryData);
 
                 const cityModel = new JSONModel(selectedCountryData);
 
                 this.getView().setModel(cityModel, "cityName");
+            },
+
+            _dataFormat: {
+                ProductCollection: []
+            },
+
+            onSavePressed: function () {
+                console.log("Form SUbmitted");
+
+                const orderId = this.byId("app_input_orderno").getValue();
+                const customerName = this.byId(
+                    "app_input_customername"
+                ).getValue();
+
+                const countryName = this.byId("app_input_country")
+                    ?.getSelectedItem()
+                    ?.getText();
+                const cityName = this.byId("app_input_city")
+                    ?.getSelectedItem()
+                    ?.getText();
+
+                const date = this.byId("app_input_date").getValue();
+
+                const newCustomerData = {
+                    OrderId: orderId,
+                    CustomerName: customerName || "John Doe",
+                    Address: `${cityName || "Dhaka"}, ${
+                        countryName || "Bangladesh"
+                    }`,
+                    Date: date
+                        ? new Date(date).toLocaleDateString("en-us", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric"
+                          })
+                        : new Date("11/24/22").toLocaleDateString("en-us", {
+                              weekday: "long",
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric"
+                          }),
+                    Delivered: false
+                    // Date: date
+                };
+
+                this._dataFormat.ProductCollection.push(newCustomerData);
+
+                if (localStorage.getItem("LocalStorageData")) {
+                    let newARR = JSON.parse(
+                        localStorage.getItem("LocalStorageData")
+                    );
+
+                    newARR.ProductCollection.push(newCustomerData);
+
+                    localStorage.setItem(
+                        "LocalStorageData",
+                        JSON.stringify(newARR)
+                    );
+                } else {
+                    localStorage.setItem(
+                        "LocalStorageData",
+                        JSON.stringify(this._dataFormat)
+                    );
+                    console.log("not found");
+                }
+
+                this.oRouter.navTo("master", {
+                    layout: fioriLibrary.LayoutType.OneColumn
+                });
+
+                this.getView().getModel().refresh();
+
+                // this.byId("app_input_orderno").setValue("");
+
+                // this.byId("app_input_orderno").setValue(
+                //     parseInt(Date.now() + Math.random())
+                //         .toString()
+                //         .slice(6)
+                // );
+
+                // var oFCL = this.oView.getParent().getParent();
+                // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
+
+                // const localStorageData =
+                //     localStorage.getItem("LocalStorageData");
+                // const parseData = JSON.parse(localStorageData);
+                // // console.log(parseData, "parseData");
+                // const ProductsModel = new JSONModel(parseData);
+                // this.getView().setModel(ProductsModel);
             }
         });
     }
