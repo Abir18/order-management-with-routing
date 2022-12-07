@@ -34,7 +34,7 @@ sap.ui.define(
                     localStorage.getItem("LocalStorageData")
                 );
 
-                const filteredProduct = getProducts.ProductCollection.find(
+                const filteredProduct = getProducts?.ProductCollection?.find(
                     (product) => product.OrderId == productId
                 );
 
@@ -201,12 +201,12 @@ sap.ui.define(
 
                 // console.log(id, "localData");
 
-                const filteredData = localData.ProductCollection.filter(
+                const filteredData = localData?.ProductCollection.filter(
                     (product) => product.OrderId == id
                 );
                 // console.log(filteredData, "filteredData");
 
-                if (filteredData.length > 0) {
+                if (filteredData?.length > 0) {
                     console.log("found");
                     console.log(filteredData, "ff");
 
@@ -226,7 +226,9 @@ sap.ui.define(
                     const updatedCustomerData = {
                         OrderId: orderId,
                         CustomerName: customerName,
-                        Address: `${cityName}, ${countryName}`,
+                        Address: `${cityName || "Dhaka"}, ${
+                            countryName || "Bangladesh"
+                        }`,
                         Date: date
                             ? new Date(date).toLocaleDateString("en-us", {
                                   weekday: "long",
@@ -244,7 +246,7 @@ sap.ui.define(
                         Delivered: false
                     };
 
-                    console.log(updatedCustomerData, "updatedCustomerData");
+                    // console.log(updatedCustomerData, "updatedCustomerData");
 
                     const mappedData = localData.ProductCollection.map(
                         (product) => {
@@ -264,8 +266,23 @@ sap.ui.define(
                         JSON.stringify(this._dataFormat)
                     );
 
-                    console.log("mappedData", mappedData);
-                    console.log("this._dataFormat", this._dataFormat);
+                    // const localStorageData =
+                    //     localStorage.getItem("LocalStorageData");
+                    // const parseData = JSON.parse(localStorageData);
+                    // console.log(parseData, "parseData");
+                    // const ProductsModel = new JSONModel(parseData);
+                    // this.getView().setModel(ProductsModel, "products");
+
+                    this.oRouter.navTo("master", {
+                        layout: fioriLibrary.LayoutType.OneColumn
+                    });
+
+                    // this.getView().getModel("products").refresh();
+
+                    // sap.ui.getCore().byId("gridTable").getModel().refresh(true);
+
+                    // console.log("mappedData", mappedData);
+                    // console.log("this._dataFormat", this._dataFormat);
                 } else {
                     // console.log("not found");
                     console.log("Form SUbmitted");
@@ -328,11 +345,11 @@ sap.ui.define(
                         console.log("not found");
                     }
 
-                    this.oRouter.navTo("master", {
-                        layout: fioriLibrary.LayoutType.OneColumn
-                    });
+                    // this.oRouter.navTo("master", {
+                    //     layout: fioriLibrary.LayoutType.OneColumn
+                    // });
 
-                    this.getView().getModel("products").refresh();
+                    // this.getView().getModel("products").refresh();
 
                     // this.byId("app_input_orderno").setValue("");
 
@@ -351,6 +368,14 @@ sap.ui.define(
                     // console.log(parseData, "parseData");
                     const ProductsModel = new JSONModel(parseData);
                     this.getView().setModel(ProductsModel, "products");
+
+                    this.oRouter.navTo("master", {
+                        layout: fioriLibrary.LayoutType.OneColumn
+                    });
+
+                    // sap.ui.getCore().byId("gridTable").getModel().refresh(true);
+
+                    // this.getView().getModel("products").refresh();
                 }
             }
         });

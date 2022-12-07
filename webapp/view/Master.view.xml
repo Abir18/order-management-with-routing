@@ -13,6 +13,7 @@
 	>
 		<m:content>
 			<Table
+				id="gridTable"
 				rows="{products>/ProductCollection}"
 				selectionMode="Single"
 				ariaLabelledBy="title"

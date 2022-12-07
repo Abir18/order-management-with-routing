@@ -40,9 +40,7 @@ sap.ui.define(
                 this.oView = this.getView();
                 this._bDescendingSort = false;
                 this.oProductsTable = this.oView.byId("productsTable");
-                this.oRouter = this.getOwnerComponent().getRouter();
-
-                // this.getView().getModel("products").refresh();
+                // this.oRouter = this.getOwnerComponent().getRouter();
 
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
@@ -50,6 +48,26 @@ sap.ui.define(
                 // console.log(parseData, "parseData");
                 const ProductsModel = new JSONModel(parseData);
                 this.getView().setModel(ProductsModel, "products");
+
+                this.oOwnerComponent = this.getOwnerComponent();
+
+                this.oRouter = this.oOwnerComponent.getRouter();
+
+                this.oRouter.attachRouteMatched(this.onRouteMatched, this);
+            },
+
+            onRouteMatched: function (oEvent) {
+                console.log("came in");
+                const localStorageData =
+                    localStorage.getItem("LocalStorageData");
+                const parseData = JSON.parse(localStorageData);
+                console.log(parseData, "parseData");
+                const ProductsModel = new JSONModel(parseData);
+                this.getView().setModel(ProductsModel, "products");
+            },
+
+            test: function () {
+                console.log("test");
             },
 
             onSearch: function (oEvent) {
@@ -82,6 +100,29 @@ sap.ui.define(
             },
 
             onListItemPress: function (oEvent) {
+                // console.log(delivered, "delivered");
+                // console.log(
+                //     oEvent
+                //         .getSource()
+                //         .getBindingContext("products")
+                //         .getObject(),
+                //     "oEvent"
+                // );
+
+                const selectedItem =
+                    oEvent
+                        ?.getSource()
+                        ?.getBindingContext("products")
+                        ?.getObject() || "";
+
+                const { Delivered: delivered } = selectedItem;
+
+                console.log(delivered, "delivered");
+
+                if (delivered) {
+                    MessageToast.show("Order already delivered.");
+                    return;
+                }
                 if (oEvent.getSource().getBindingContext("products")) {
                     // console.log("items found");
 
@@ -190,9 +231,17 @@ sap.ui.define(
                                 const ProductsModel = new JSONModel(
                                     getParseData
                                 );
-                                this.getView().setModel(ProductsModel);
+                                this.getView().setModel(
+                                    ProductsModel,
+                                    "products"
+                                );
                                 //==============
                                 this.oDefaultDialog.close();
+
+                                this.oRouter.navTo("master", {
+                                    layout: fioriLibrary.LayoutType.OneColumn
+                                });
+
                                 this.getView().getModel().refresh();
                                 var msg = "User status changed";
                                 MessageToast.show(msg);
@@ -239,11 +288,11 @@ sap.ui.define(
                 const parseData = JSON.parse(localStorageData);
                 console.log(parseData, "parseData");
                 const ProductsModel = new JSONModel(parseData);
-                this.getView().setModel(ProductsModel);
+                this.getView().setModel(ProductsModel, "products");
 
-                this.oRouter.navTo("master", {
-                    layout: fioriLibrary.LayoutType.OneColumn
-                });
+                // this.oRouter.navTo("master", {
+                //     layout: fioriLibrary.LayoutType.OneColumn
+                // });
 
                 // this.getView().getModel().refresh();
             }
