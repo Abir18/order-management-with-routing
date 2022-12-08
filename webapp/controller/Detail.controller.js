@@ -24,60 +24,56 @@ sap.ui.define(
             },
 
             _onProductMatched: function (oEvent) {
-                let hashRouteMatched =
-                    sap.ui.core.UIComponent.getRouterFor(this).oHashChanger
-                        .hash;
+                const productIndex = oEvent.getParameter("arguments").product;
 
-                let productId = hashRouteMatched.split("/")[1];
+                if (productIndex) {
+                    this.byId("detail_form").bindElement(
+                        `products>/ProductCollection/${productIndex}`
+                    );
 
-                const getProducts = JSON.parse(
-                    localStorage.getItem("LocalStorageData")
-                );
+                    const localStorageData =
+                        localStorage.getItem("LocalStorageData");
+                    const parseData = JSON.parse(localStorageData);
+                    const ProductsModel = new JSONModel(parseData);
+                    this.getView().setModel(ProductsModel, "products");
 
-                const filteredProduct = getProducts?.ProductCollection?.find(
-                    (product) => product.OrderId == productId
-                );
+                    // console.log(
+                    //     this.getView().getBindingContext("products").getObject(),
+                    //     "obj"
+                    // );
 
-                // console.log(filteredProduct, "filteredProduct");
+                    let oId = this.byId("app_input_orderno");
+                    oId.bindElement(`/ProductCollection/OrderId`);
 
-                if (filteredProduct) {
-                    const {
-                        CustomerName: customerName,
-                        Address: address,
-                        Date: date
-                    } = filteredProduct;
+                    let oName = this.byId("app_input_customername");
+                    oName.bindElement(`/ProductCollection/CustomerName`);
 
-                    const city = address.split(",")[0];
-                    const country = address.split(",")[1];
+                    if (productIndex == "new") {
+                        console.log("new cust");
 
-                    const dateFormat = date.split(",");
+                        const randomId = parseInt(Date.now() + Math.random())
+                            .toString()
+                            .slice(6);
+                        const product = {
+                            ProductCollection: [
+                                {
+                                    OrderId: randomId,
+                                    CustomerName: ""
+                                }
+                            ]
+                        };
 
-                    const dateValue = dateFormat[1] + "," + dateFormat[2];
+                        let newCustomer = new JSONModel(product);
 
-                    this.byId("app_input_orderno").setValue(productId);
-                    this.byId("app_input_customername").setValue(customerName);
-                    this.byId("app_input_country").setValue(country);
-                    this.byId("app_input_city").setValue(city);
-                    this.byId("app_input_date").setValue(dateValue);
-                } else {
-                    const randomId = parseInt(Date.now() + Math.random())
-                        .toString()
-                        .slice(6);
-                    this.byId("app_input_orderno").setValue(randomId);
-                    this.byId("app_input_customername").setValue("");
-                    this.byId("app_input_country").setValue("");
-                    this.byId("app_input_city").setValue("");
-                    this.byId("app_input_date").setValue("");
+                        this.getView().setModel(newCustomer, "products");
+
+                        this.byId("detail_form").bindElement(
+                            `products>/ProductCollection`
+                        );
+
+                        this.byId("app_input_orderno").setValue(randomId);
+                    }
                 }
-
-                this._product =
-                    oEvent.getParameter("arguments").product ||
-                    this._product ||
-                    "0";
-                this.getView().bindElement({
-                    path: "/ProductCollection/" + this._product,
-                    model: "products"
-                });
             },
 
             onEditToggleButtonPress: function () {
@@ -96,14 +92,18 @@ sap.ui.define(
                     .detachPatternMatched(this._onProductMatched, this);
             },
 
+            // When User Click Close Button of Side Panel
             onCancelPressed: function () {
                 // var oFCL = this.oView.getParent().getParent();
-
                 // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
 
                 this.oRouter.navTo("master", {
                     layout: fioriLibrary.LayoutType.OneColumn
                 });
+
+                this.byId("app_input_country").setValue("");
+                this.byId("app_input_city").setValue("");
+                this.byId("app_input_date").setValue("");
             },
 
             handleValueHelp: function () {
@@ -192,6 +192,7 @@ sap.ui.define(
                 ProductCollection: []
             },
 
+            // When User Click Submit Button
             onSavePressed: function () {
                 const localData = JSON.parse(
                     localStorage.getItem("LocalStorageData")
@@ -199,17 +200,11 @@ sap.ui.define(
 
                 const id = this.byId("app_input_orderno").getValue();
 
-                // console.log(id, "localData");
-
                 const filteredData = localData?.ProductCollection.filter(
                     (product) => product.OrderId == id
                 );
-                // console.log(filteredData, "filteredData");
 
                 if (filteredData?.length > 0) {
-                    console.log("found");
-                    console.log(filteredData, "ff");
-
                     const orderId = this.byId("app_input_orderno").getValue();
                     const customerName = this.byId(
                         "app_input_customername"
@@ -223,25 +218,28 @@ sap.ui.define(
 
                     const date = this.byId("app_input_date").getValue();
 
+                    if (
+                        customerName == "" ||
+                        countryName == "" ||
+                        cityName == "" ||
+                        date == ""
+                    ) {
+                        // console.log("nNot found");
+                        return;
+                    }
+
                     const updatedCustomerData = {
                         OrderId: orderId,
                         CustomerName: customerName,
                         Address: `${cityName || "Dhaka"}, ${
                             countryName || "Bangladesh"
                         }`,
-                        Date: date
-                            ? new Date(date).toLocaleDateString("en-us", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric"
-                              })
-                            : new Date("11/24/22").toLocaleDateString("en-us", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric"
-                              }),
+                        Date: new Date(date).toLocaleDateString("en-us", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric"
+                        }),
                         // Date: date
                         Delivered: false
                     };
@@ -266,25 +264,10 @@ sap.ui.define(
                         JSON.stringify(this._dataFormat)
                     );
 
-                    // const localStorageData =
-                    //     localStorage.getItem("LocalStorageData");
-                    // const parseData = JSON.parse(localStorageData);
-                    // console.log(parseData, "parseData");
-                    // const ProductsModel = new JSONModel(parseData);
-                    // this.getView().setModel(ProductsModel, "products");
-
                     this.oRouter.navTo("master", {
                         layout: fioriLibrary.LayoutType.OneColumn
                     });
-
-                    // this.getView().getModel("products").refresh();
-
-                    // sap.ui.getCore().byId("gridTable").getModel().refresh(true);
-
-                    // console.log("mappedData", mappedData);
-                    // console.log("this._dataFormat", this._dataFormat);
                 } else {
-                    // console.log("not found");
                     console.log("Form SUbmitted");
 
                     const orderId = this.byId("app_input_orderno").getValue();
@@ -301,25 +284,26 @@ sap.ui.define(
 
                     const date = this.byId("app_input_date").getValue();
 
+                    if (
+                        customerName == "" ||
+                        countryName == "" ||
+                        cityName == "" ||
+                        date == ""
+                    ) {
+                        // console.log("Not found");
+                        return;
+                    }
+
                     const newCustomerData = {
                         OrderId: orderId,
-                        CustomerName: customerName || "John Doe",
-                        Address: `${cityName || "Dhaka"}, ${
-                            countryName || "Bangladesh"
-                        }`,
-                        Date: date
-                            ? new Date(date).toLocaleDateString("en-us", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric"
-                              })
-                            : new Date("11/24/22").toLocaleDateString("en-us", {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "short",
-                                  day: "numeric"
-                              }),
+                        CustomerName: customerName,
+                        Address: `${cityName}, ${countryName}`,
+                        Date: new Date(date).toLocaleDateString("en-us", {
+                            weekday: "long",
+                            year: "numeric",
+                            month: "short",
+                            day: "numeric"
+                        }),
                         Delivered: false
                         // Date: date
                     };
@@ -345,23 +329,6 @@ sap.ui.define(
                         console.log("not found");
                     }
 
-                    // this.oRouter.navTo("master", {
-                    //     layout: fioriLibrary.LayoutType.OneColumn
-                    // });
-
-                    // this.getView().getModel("products").refresh();
-
-                    // this.byId("app_input_orderno").setValue("");
-
-                    // this.byId("app_input_orderno").setValue(
-                    //     parseInt(Date.now() + Math.random())
-                    //         .toString()
-                    //         .slice(6)
-                    // );
-
-                    // var oFCL = this.oView.getParent().getParent();
-                    // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
-
                     const localStorageData =
                         localStorage.getItem("LocalStorageData");
                     const parseData = JSON.parse(localStorageData);
@@ -372,6 +339,10 @@ sap.ui.define(
                     this.oRouter.navTo("master", {
                         layout: fioriLibrary.LayoutType.OneColumn
                     });
+
+                    this.byId("app_input_country").setValue("");
+                    this.byId("app_input_city").setValue("");
+                    this.byId("app_input_date").setValue("");
 
                     // sap.ui.getCore().byId("gridTable").getModel().refresh(true);
 

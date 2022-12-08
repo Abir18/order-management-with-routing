@@ -57,11 +57,11 @@ sap.ui.define(
             },
 
             onRouteMatched: function (oEvent) {
-                console.log("came in");
+                // console.log("came in");
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
                 const parseData = JSON.parse(localStorageData);
-                console.log(parseData, "parseData");
+                // console.log(parseData, "parseData");
                 const ProductsModel = new JSONModel(parseData);
                 this.getView().setModel(ProductsModel, "products");
             },
@@ -100,15 +100,6 @@ sap.ui.define(
             },
 
             onListItemPress: function (oEvent) {
-                // console.log(delivered, "delivered");
-                // console.log(
-                //     oEvent
-                //         .getSource()
-                //         .getBindingContext("products")
-                //         .getObject(),
-                //     "oEvent"
-                // );
-
                 const selectedItem =
                     oEvent
                         ?.getSource()
@@ -117,7 +108,7 @@ sap.ui.define(
 
                 const { Delivered: delivered } = selectedItem;
 
-                console.log(delivered, "delivered");
+                // console.log(delivered, "delivered");
 
                 if (delivered) {
                     MessageToast.show("Order already delivered.");
@@ -140,31 +131,21 @@ sap.ui.define(
                         .getModel()
                         .getData();
 
-                    // let q = pData.ProductCollection.filter((p) => p[0]);
-
                     let selectedProduct =
                         pData.ProductCollection[product].OrderId;
 
-                    // console.log(selectedProduct, "id");
-
-                    // console.log("sadasd", oData);
-                    // console.log("ppp", pData);
-                    // console.log("ppp", q);
-
                     this.oRouter.navTo("detail", {
                         layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
-                        product: selectedProduct
+                        product: product
                     });
                 } else {
-                    // console.log("not found");
-
                     const randomId = parseInt(Date.now() + Math.random())
                         .toString()
                         .slice(6);
 
                     this.oRouter.navTo("detail", {
                         layout: fioriLibrary.LayoutType.TwoColumnsBeginExpanded,
-                        product: randomId
+                        product: "new"
                     });
                 }
             },
@@ -202,12 +183,10 @@ sap.ui.define(
                                         }
                                         return data;
                                     });
-                                // console.log(updatedData, "updatedData");
-                                // console.log(parseData, "parseData");
+
                                 let mappedStatusData =
                                     parseData.ProductCollection.map((order) => {
                                         if (order.OrderId == orderId) {
-                                            // console.log(orderId, "in the middle");
                                             return updatedData[0];
                                         }
                                         return order;

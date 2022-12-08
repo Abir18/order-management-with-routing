@@ -24,10 +24,7 @@
 				/>
 			</items>
 		</FlexBox>
-		<f:Form
-			id="detail_form"
-			editable="true"
-		>
+		<f:Form id="detail_form">
 			<f:title>
 				<core:Title text="{i18n>addForm}"/>
 			</f:title>
@@ -55,7 +52,8 @@
 							<f:fields>
 								<Input
 									id="app_input_orderno"
-									value=""
+									editable="false"
+									value="{products>OrderId}"
 									enabled="{oSaveModel>/saveMode}"
 								/>
 							</f:fields>
@@ -64,7 +62,7 @@
 							<f:fields>
 								<Input
 									id="app_input_customername"
-									value=""
+									value="{products>CustomerName}"
 									showValueHelp="true"
 									valueHelpOnly="true"
 									valueHelpRequest="handleValueHelp"
