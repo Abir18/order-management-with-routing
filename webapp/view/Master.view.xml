@@ -67,7 +67,7 @@
 					>
 						<m:Label text="{i18n>address}"/>
 						<template>
-							<m:Text text="{products>Address}"/>
+							<m:Text text="{products>City}, {products>Country}"/>
 						</template>
 					</Column>
 					<Column
@@ -115,13 +115,6 @@
 								press="onListItemPress"
 							/>
 						</template>
-					</Column>
-					<Column>
-						<m:Label text="Action2"/>
-						<m:HBox>
-							<m:Button icon="sap-icon://navigation-right-arrow"/>
-							<core:Icon src="sap-icon://feeder-arrow"/>
-						</m:HBox>
 					</Column>
 				</columns>
 			</Table>

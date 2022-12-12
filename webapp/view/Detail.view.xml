@@ -88,10 +88,10 @@
 										<Select
 											width="100%"
 											id="app_input_country"
-											selectedKey=""
+											selectedKey="{products>Country}"
 											items="{countries>/}"
 											change="onCountryChange"
-											forceSelection="false"
+											forceSelection="true"
 										>
 											<items>
 												<core:Item
@@ -114,9 +114,9 @@
 										<Select
 											width="100%"
 											id="app_input_city"
-											selectedKey=""
+											selectedKey="{products>City}"
 											items="{cityName>/cities}"
-											forceSelection="false"
+											forceSelection="true"
 										>
 											<items>
 												<core:Item
@@ -133,6 +133,7 @@
 							<f:fields>
 								<DatePicker
 									id="app_input_date"
+									value="{products>Date}"
 									class="sapUiSmallMarginBottom"
 								/>
 							</f:fields>

@@ -239,8 +239,7 @@ sap.ui.define(
                     this.getView().addDependent(this.oDefaultDialog);
                 }
                 this.getView().getModel().refresh();
-                console.log("this.oDefaultDialog");
-                console.log(this.oDefaultDialog, "this.oDefaultDialog");
+
                 this.oDefaultDialog.open();
             },
 

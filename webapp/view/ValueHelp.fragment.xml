@@ -19,7 +19,7 @@
 			<cells>
 				<ObjectIdentifier title="{customers>OrderId}"/>
 				<Text text="{customers>CustomerName}"/>
-				<Text text="{customers>Address}"/>
+				<Text text="{customers>City}, {customers>Country}"/>
 			</cells>
 		</ColumnListItem>
 		<columns>

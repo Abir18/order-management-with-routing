@@ -37,20 +37,24 @@ sap.ui.define(
                     const ProductsModel = new JSONModel(parseData);
                     this.getView().setModel(ProductsModel, "products");
 
-                    // console.log(
-                    //     this.getView().getBindingContext("products").getObject(),
-                    //     "obj"
-                    // );
+                    console.log(
+                        this.getView().getBindingContext("products"),
+                        "obj"
+                    );
 
-                    let oId = this.byId("app_input_orderno");
-                    oId.bindElement(`/ProductCollection/OrderId`);
+                    // let oId = this.byId("app_input_orderno");
+                    // oId.bindElement(`/ProductCollection/OrderId`);
 
-                    let oName = this.byId("app_input_customername");
-                    oName.bindElement(`/ProductCollection/CustomerName`);
+                    // let oName = this.byId("app_input_customername");
+                    // oName.bindElement(`/ProductCollection/CustomerName`);
+
+                    // let oCountry = this.byId("app_input_country");
+                    // oCountry.setSelectedKey(2);
+
+                    let oCountry = this.byId("app_input_country");
+                    oCountry.bindElement(`/ProductCollection/Country`);
 
                     if (productIndex == "new") {
-                        console.log("new cust");
-
                         const randomId = parseInt(Date.now() + Math.random())
                             .toString()
                             .slice(6);
@@ -140,7 +144,6 @@ sap.ui.define(
                 var oSelectedItem = oEvent.getParameter("listItem"),
                     oInput = this.byId("app_input_customername");
 
-                console.log("oSelectedItem", oSelectedItem);
                 oSelectedItem.getCells();
 
                 if (!oSelectedItem) {
@@ -231,9 +234,12 @@ sap.ui.define(
                     const updatedCustomerData = {
                         OrderId: orderId,
                         CustomerName: customerName,
-                        Address: `${cityName || "Dhaka"}, ${
-                            countryName || "Bangladesh"
-                        }`,
+                        City: cityName,
+                        Country: countryName,
+
+                        // Address: `${cityName || "Dhaka"}, ${
+                        //     countryName || "Bangladesh"
+                        // }`,
                         Date: new Date(date).toLocaleDateString("en-us", {
                             weekday: "long",
                             year: "numeric",
@@ -268,7 +274,7 @@ sap.ui.define(
                         layout: fioriLibrary.LayoutType.OneColumn
                     });
                 } else {
-                    console.log("Form SUbmitted");
+                    // console.log("Form SUbmitted");
 
                     const orderId = this.byId("app_input_orderno").getValue();
                     const customerName = this.byId(
@@ -297,7 +303,9 @@ sap.ui.define(
                     const newCustomerData = {
                         OrderId: orderId,
                         CustomerName: customerName,
-                        Address: `${cityName}, ${countryName}`,
+                        City: cityName,
+                        Country: countryName,
+                        // Address: `${cityName}, ${countryName}`,
                         Date: new Date(date).toLocaleDateString("en-us", {
                             weekday: "long",
                             year: "numeric",
