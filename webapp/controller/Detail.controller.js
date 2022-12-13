@@ -44,47 +44,6 @@ sap.ui.define(
                     const ProductsModel = new JSONModel(parseData);
                     this.getView().setModel(ProductsModel, "products");
 
-                    const oModel = this.getView().getModel("products");
-
-                    if (oModel) {
-                        const productData = oModel.getData().ProductCollection;
-
-                        console.log("productData", productData[productIndex]);
-
-                        const countryName = productData[productIndex].Country;
-
-                        console.log(countryName);
-
-                        const countriesData = this.getView()
-                            .getModel("countries")
-                            .getData();
-
-                        const selectedCountryData = countriesData.find(
-                            (country) => country.countryName === countryName
-                        );
-
-                        const cityModel = new JSONModel(selectedCountryData);
-
-                        this.getView().setModel(cityModel, "cityName");
-                    }
-
-                    // console.log(
-                    //     this.getView().getBindingContext("products"),
-                    //     "obj"
-                    // );
-
-                    // let oId = this.byId("app_input_orderno");
-                    // oId.bindElement(`/ProductCollection/OrderId`);
-
-                    // let oName = this.byId("app_input_customername");
-                    // oName.bindElement(`/ProductCollection/CustomerName`);
-
-                    // let oCountry = this.byId("app_input_country");
-                    // oCountry.setSelectedKey(2);
-
-                    // let oCity = this.byId("app_input_city");
-                    // oCountry.bindElement(`/ProductCollection/Country`);
-
                     if (productIndex == "new") {
                         const randomId = parseInt(Date.now() + Math.random())
                             .toString()
@@ -107,6 +66,37 @@ sap.ui.define(
                         );
 
                         this.byId("app_input_orderno").setValue(randomId);
+                    } else {
+                        const oModel = this.getView().getModel("products");
+
+                        if (oModel) {
+                            const productData =
+                                oModel.getData().ProductCollection;
+
+                            console.log(
+                                "productData",
+                                productData[productIndex]
+                            );
+
+                            const countryName =
+                                productData[productIndex].Country;
+
+                            console.log(countryName);
+
+                            const countriesData = this.getView()
+                                .getModel("countries")
+                                .getData();
+
+                            const selectedCountryData = countriesData.find(
+                                (country) => country.countryName === countryName
+                            );
+
+                            const cityModel = new JSONModel(
+                                selectedCountryData
+                            );
+
+                            this.getView().setModel(cityModel, "cityName");
+                        }
                     }
                 }
             },
