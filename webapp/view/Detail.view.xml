@@ -91,7 +91,7 @@
 											selectedKey="{products>Country}"
 											items="{countries>/}"
 											change="onCountryChange"
-											forceSelection="true"
+											forceSelection="false"
 										>
 											<items>
 												<core:Item
@@ -116,7 +116,7 @@
 											id="app_input_city"
 											selectedKey="{products>City}"
 											items="{cityName>/cities}"
-											forceSelection="true"
+											forceSelection="false"
 										>
 											<items>
 												<core:Item

@@ -26,6 +26,13 @@ sap.ui.define(
             _onProductMatched: function (oEvent) {
                 const productIndex = oEvent.getParameter("arguments").product;
 
+                console.log(oEvent.getParameter("arguments"), "productIndex");
+
+                // console.log(
+                //     "obj",
+                //     this.getView().getBindingContext("products").getObject()
+                // );
+
                 if (productIndex) {
                     this.byId("detail_form").bindElement(
                         `products>/ProductCollection/${productIndex}`
@@ -37,10 +44,34 @@ sap.ui.define(
                     const ProductsModel = new JSONModel(parseData);
                     this.getView().setModel(ProductsModel, "products");
 
-                    console.log(
-                        this.getView().getBindingContext("products"),
-                        "obj"
-                    );
+                    const oModel = this.getView().getModel("products");
+
+                    if (oModel) {
+                        const productData = oModel.getData().ProductCollection;
+
+                        console.log("productData", productData[productIndex]);
+
+                        const countryName = productData[productIndex].Country;
+
+                        console.log(countryName);
+
+                        const countriesData = this.getView()
+                            .getModel("countries")
+                            .getData();
+
+                        const selectedCountryData = countriesData.find(
+                            (country) => country.countryName === countryName
+                        );
+
+                        const cityModel = new JSONModel(selectedCountryData);
+
+                        this.getView().setModel(cityModel, "cityName");
+                    }
+
+                    // console.log(
+                    //     this.getView().getBindingContext("products"),
+                    //     "obj"
+                    // );
 
                     // let oId = this.byId("app_input_orderno");
                     // oId.bindElement(`/ProductCollection/OrderId`);
@@ -51,8 +82,8 @@ sap.ui.define(
                     // let oCountry = this.byId("app_input_country");
                     // oCountry.setSelectedKey(2);
 
-                    let oCountry = this.byId("app_input_country");
-                    oCountry.bindElement(`/ProductCollection/Country`);
+                    // let oCity = this.byId("app_input_city");
+                    // oCountry.bindElement(`/ProductCollection/Country`);
 
                     if (productIndex == "new") {
                         const randomId = parseInt(Date.now() + Math.random())
