@@ -57,7 +57,7 @@ sap.ui.define(
             },
 
             onRouteMatched: function (oEvent) {
-                // console.log("came in");
+                console.log("came in delete");
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
                 const parseData = JSON.parse(localStorageData);
@@ -150,8 +150,54 @@ sap.ui.define(
                 }
             },
 
+            statusChangedConfirmed: function () {
+                let idForStatus = localStorage.getItem("statusIdInLocal");
+
+                const localStorageData =
+                    localStorage.getItem("LocalStorageData");
+                const parseData = JSON.parse(localStorageData);
+                let updatedData = parseData.ProductCollection.filter(
+                    (order) => {
+                        // console.log(orderId, "orderId");
+                        return order.OrderId == idForStatus;
+                    }
+                ).map((data) => {
+                    if (data.Delivered == false) {
+                        data.Delivered = true;
+                        console.log(data.Delivered, "data.Delivered");
+                        return data;
+                    }
+                    return data;
+                });
+
+                let mappedStatusData = parseData.ProductCollection.map(
+                    (order) => {
+                        if (order.OrderId == idForStatus) {
+                            return updatedData[0];
+                        }
+                        return order;
+                    }
+                );
+
+                let data = {
+                    ProductCollection: mappedStatusData
+                };
+                console.log(data, "data");
+
+                localStorage.setItem("LocalStorageData", JSON.stringify(data));
+
+                const getlocalStorageData =
+                    localStorage.getItem("LocalStorageData");
+                const getParseData = JSON.parse(getlocalStorageData);
+                // console.log(getParseData, "parseData");
+                const ProductsModel = new JSONModel(getParseData);
+                this.getView().setModel(ProductsModel, "products");
+            },
+
             onStatusChanged: function (orderId, delivered) {
                 if (delivered) return;
+
+                localStorage.setItem("statusIdInLocal", orderId);
 
                 if (!this.oDefaultDialog) {
                     console.log("Helllooooooo");
@@ -163,57 +209,7 @@ sap.ui.define(
                             type: ButtonType.Emphasized,
                             text: "OK",
                             press: function () {
-                                const localStorageData =
-                                    localStorage.getItem("LocalStorageData");
-                                const parseData = JSON.parse(localStorageData);
-                                let updatedData =
-                                    parseData.ProductCollection.filter(
-                                        (order) => {
-                                            // console.log(orderId, "orderId");
-                                            return order.OrderId == orderId;
-                                        }
-                                    ).map((data) => {
-                                        if (data.Delivered == false) {
-                                            data.Delivered = true;
-                                            console.log(
-                                                data.Delivered,
-                                                "data.Delivered"
-                                            );
-                                            return data;
-                                        }
-                                        return data;
-                                    });
-
-                                let mappedStatusData =
-                                    parseData.ProductCollection.map((order) => {
-                                        if (order.OrderId == orderId) {
-                                            return updatedData[0];
-                                        }
-                                        return order;
-                                    });
-
-                                let data = {
-                                    ProductCollection: mappedStatusData
-                                };
-                                console.log(data, "data");
-
-                                localStorage.setItem(
-                                    "LocalStorageData",
-                                    JSON.stringify(data)
-                                );
-
-                                const getlocalStorageData =
-                                    localStorage.getItem("LocalStorageData");
-                                const getParseData =
-                                    JSON.parse(getlocalStorageData);
-                                // console.log(getParseData, "parseData");
-                                const ProductsModel = new JSONModel(
-                                    getParseData
-                                );
-                                this.getView().setModel(
-                                    ProductsModel,
-                                    "products"
-                                );
+                                this.statusChangedConfirmed();
                                 //==============
                                 this.oDefaultDialog.close();
 
@@ -242,37 +238,62 @@ sap.ui.define(
 
                 this.oDefaultDialog.open();
             },
-
-            onDeleteButtonPressed: function (orderId) {
-                console.log(orderId, typeof orderId);
-                // console.log(oEvent.getParameters());
-                console.log("Deleted");
-
-                let allOrders = JSON.parse(
+            deleteConfirmed: async function () {
+                let idFordel = localStorage.getItem("deleteIdInLocal");
+                let allOrders = await JSON.parse(
                     localStorage.getItem("LocalStorageData")
                 );
-                // console.log(allOrders.ProductCollection);
 
-                let updatedOrderData = allOrders.ProductCollection.filter(
-                    (order) => order.OrderId !== orderId
+                let updatedOrderData = await allOrders.ProductCollection.filter(
+                    (order) => order.OrderId !== idFordel
                 );
 
-                let data = { ProductCollection: updatedOrderData };
-
+                let data = {
+                    ProductCollection: updatedOrderData
+                };
                 localStorage.setItem("LocalStorageData", JSON.stringify(data));
 
-                const localStorageData =
-                    localStorage.getItem("LocalStorageData");
-                const parseData = JSON.parse(localStorageData);
-                console.log(parseData, "parseData");
-                const ProductsModel = new JSONModel(parseData);
+                const ProductsModel = new JSONModel(data);
                 this.getView().setModel(ProductsModel, "products");
+                this.getView().getModel().refresh();
+            },
+            onDeleteButtonPressed: async function (orderId) {
+                localStorage.setItem("deleteIdInLocal", orderId);
 
-                // this.oRouter.navTo("master", {
-                //     layout: fioriLibrary.LayoutType.OneColumn
-                // });
+                if (!this.oDeleteDialog) {
+                    this.oDeleteDialog = await new Dialog({
+                        title: "Are you sure to delete?",
 
-                // this.getView().getModel().refresh();
+                        beginButton: new Button({
+                            type: ButtonType.Emphasized,
+                            text: "Delete",
+                            press: function () {
+                                this.deleteConfirmed();
+
+                                var msg = "Data Deleted";
+                                this.oDeleteDialog.close();
+                                MessageToast.show(msg);
+                            }.bind(this)
+                        }),
+                        endButton: new Button({
+                            text: "Close",
+                            press: function () {
+                                this.oDeleteDialog.close();
+                            }.bind(this)
+                        })
+                    });
+
+                    console.log(this.oDeleteDialog, "this.oDeleteDialog");
+                    // to get access to the controller's model
+                    this.getView().addDependent(this.oDeleteDialog);
+                }
+                this.getView().getModel().refresh();
+
+                this.oDeleteDialog.open();
+
+                sap.ui
+                    .controller("sap.test.routing.controller.Detail")
+                    .onCancelPressed(this);
             }
         });
     }

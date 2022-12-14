@@ -17,6 +17,7 @@
 				rows="{products>/ProductCollection}"
 				selectionMode="Single"
 				ariaLabelledBy="title"
+				selectionBehavior="RowOnly"
 			>
 				<extension>
 					<m:OverflowToolbar style="Clear">

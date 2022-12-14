@@ -26,7 +26,7 @@ sap.ui.define(
             _onProductMatched: function (oEvent) {
                 const productIndex = oEvent.getParameter("arguments").product;
 
-                console.log(oEvent.getParameter("arguments"), "productIndex");
+                // console.log(oEvent.getParameter("arguments"), "productIndex");
 
                 // console.log(
                 //     "obj",
