@@ -73,15 +73,8 @@ sap.ui.define(
                             const productData =
                                 oModel.getData().ProductCollection;
 
-                            console.log(
-                                "productData",
-                                productData[productIndex]
-                            );
-
                             const countryName =
                                 productData[productIndex].Country;
-
-                            console.log(countryName);
 
                             const countriesData = this.getView()
                                 .getModel("countries")
@@ -118,17 +111,27 @@ sap.ui.define(
             },
 
             // When User Click Close Button of Side Panel
-            onCancelPressed: function () {
+            onCancelPressed: function (oRouter = null) {
                 // var oFCL = this.oView.getParent().getParent();
                 // oFCL.setLayout(fioriLibrary.LayoutType.OneColumn);
-
-                this.oRouter.navTo("master", {
-                    layout: fioriLibrary.LayoutType.OneColumn
-                });
 
                 this.byId("app_input_country").setValue("");
                 this.byId("app_input_city").setValue("");
                 this.byId("app_input_date").setValue("");
+
+                this.routeToOneColumn(oRouter);
+            },
+
+            routeToOneColumn: function (oRouter = null) {
+                if (this.oRouter) {
+                    oRouter = this.oRouter;
+                }
+
+                if (oRouter !== null) {
+                    oRouter.navTo("master", {
+                        layout: fioriLibrary.LayoutType.OneColumn
+                    });
+                }
             },
 
             handleValueHelp: function () {

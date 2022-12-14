@@ -40,12 +40,11 @@ sap.ui.define(
                 this.oView = this.getView();
                 this._bDescendingSort = false;
                 this.oProductsTable = this.oView.byId("productsTable");
-                // this.oRouter = this.getOwnerComponent().getRouter();
 
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
                 const parseData = JSON.parse(localStorageData);
-                // console.log(parseData, "parseData");
+
                 const ProductsModel = new JSONModel(parseData);
                 this.getView().setModel(ProductsModel, "products");
 
@@ -57,11 +56,10 @@ sap.ui.define(
             },
 
             onRouteMatched: function (oEvent) {
-                console.log("came in delete");
                 const localStorageData =
                     localStorage.getItem("LocalStorageData");
                 const parseData = JSON.parse(localStorageData);
-                // console.log(parseData, "parseData");
+
                 const ProductsModel = new JSONModel(parseData);
                 this.getView().setModel(ProductsModel, "products");
             },
@@ -108,15 +106,11 @@ sap.ui.define(
 
                 const { Delivered: delivered } = selectedItem;
 
-                // console.log(delivered, "delivered");
-
                 if (delivered) {
                     MessageToast.show("Order already delivered.");
                     return;
                 }
                 if (oEvent.getSource().getBindingContext("products")) {
-                    // console.log("items found");
-
                     var productPath = oEvent
                             .getSource()
                             .getBindingContext("products")
@@ -158,13 +152,12 @@ sap.ui.define(
                 const parseData = JSON.parse(localStorageData);
                 let updatedData = parseData.ProductCollection.filter(
                     (order) => {
-                        // console.log(orderId, "orderId");
                         return order.OrderId == idForStatus;
                     }
                 ).map((data) => {
                     if (data.Delivered == false) {
                         data.Delivered = true;
-                        console.log(data.Delivered, "data.Delivered");
+
                         return data;
                     }
                     return data;
@@ -182,7 +175,7 @@ sap.ui.define(
                 let data = {
                     ProductCollection: mappedStatusData
                 };
-                console.log(data, "data");
+                // console.log(data, "data");
 
                 localStorage.setItem("LocalStorageData", JSON.stringify(data));
 
@@ -200,8 +193,6 @@ sap.ui.define(
                 localStorage.setItem("statusIdInLocal", orderId);
 
                 if (!this.oDefaultDialog) {
-                    console.log("Helllooooooo");
-
                     this.oDefaultDialog = new Dialog({
                         title: "Are you sure to change this status?",
 
@@ -210,7 +201,7 @@ sap.ui.define(
                             text: "OK",
                             press: function () {
                                 this.statusChangedConfirmed();
-                                //==============
+
                                 this.oDefaultDialog.close();
 
                                 this.oRouter.navTo("master", {
@@ -230,7 +221,6 @@ sap.ui.define(
                         })
                     });
 
-                    console.log(this.oDefaultDialog, "this.oDefaultDialog");
                     // to get access to the controller's model
                     this.getView().addDependent(this.oDefaultDialog);
                 }
@@ -273,6 +263,16 @@ sap.ui.define(
                                 var msg = "Data Deleted";
                                 this.oDeleteDialog.close();
                                 MessageToast.show(msg);
+
+                                sap.ui
+                                    .controller(
+                                        "sap.test.routing.controller.Detail"
+                                    )
+                                    .routeToOneColumn(this.oRouter);
+
+                                // this.oRouter.navTo("master", {
+                                //     layout: fioriLibrary.LayoutType.OneColumn
+                                // });
                             }.bind(this)
                         }),
                         endButton: new Button({
@@ -283,17 +283,12 @@ sap.ui.define(
                         })
                     });
 
-                    console.log(this.oDeleteDialog, "this.oDeleteDialog");
                     // to get access to the controller's model
                     this.getView().addDependent(this.oDeleteDialog);
                 }
                 this.getView().getModel().refresh();
 
                 this.oDeleteDialog.open();
-
-                sap.ui
-                    .controller("sap.test.routing.controller.Detail")
-                    .onCancelPressed(this);
             }
         });
     }
