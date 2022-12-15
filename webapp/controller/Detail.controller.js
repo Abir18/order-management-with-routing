@@ -213,6 +213,8 @@ sap.ui.define(
                 const cityModel = new JSONModel(selectedCountryData);
 
                 this.getView().setModel(cityModel, "cityName");
+
+                this.byId("app_input_city").setSelectedKey("");
             },
 
             _dataFormat: {
